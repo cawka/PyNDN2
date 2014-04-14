@@ -10,8 +10,9 @@ This module defines the NDN Name class.
 """
 
 from io import BytesIO
-from pyndn.util import Blob
-from pyndn.util.common import Common
+from util import Blob
+from util.common import Common
+from encoding import WireFormat
 
 class Name(object):
     """
@@ -36,6 +37,40 @@ class Name(object):
             self._components = []
 
         self._changeCount = 0
+
+    def wireEncode(self, wireFormat = None):
+        """
+        Encode this Interest for a particular wire format.
+
+        :param wireFormat: (optional) A WireFormat object used to encode this
+           Interest. If omitted, use WireFormat.getDefaultWireFormat().
+        :type wireFormat: A subclass of WireFormat
+        :return: The encoded buffer.
+        :rtype: Blob
+        """
+        if wireFormat == None:
+            # Don't use a default argument since getDefaultWireFormat can change.
+            wireFormat = WireFormat.getDefaultWireFormat()
+
+        return wireFormat.encodeName(self)
+
+    def wireDecode(self, input, wireFormat = None):
+        """
+        Decode the input using a particular wire format and update this Interest.
+
+        :param input: The array with the bytes to decode.
+        :type input: An array type with int elements
+        :param wireFormat: (optional) A WireFormat object used to decode this
+           Interest. If omitted, use WireFormat.getDefaultWireFormat().
+        :type wireFormat: A subclass of WireFormat
+        """
+        if wireFormat == None:
+            # Don't use a default argument since getDefaultWireFormat can change.
+            wireFormat = WireFormat.getDefaultWireFormat()
+
+        # If input is a blob, get its buf().
+        decodeBuffer = input.buf() if isinstance(input, Blob) else input
+        wireFormat.decodeName(self, decodeBuffer)
 
     class Component(object):
         """
@@ -222,6 +257,9 @@ class Name(object):
 
         # Python operators
 
+        def __str__(self):
+            return self.getValue().toRawStr()
+
         def __eq__(self, other):
             return type(other) is Name.Component and self.equals(other)
 
@@ -312,7 +350,7 @@ class Name(object):
 
     def clear(self):
         """
-        Clear all the components.
+        Clear all the components.s
         """
         self._components = []
         self._changeCount += 1
@@ -491,6 +529,9 @@ class Name(object):
 
         return True
 
+    def isPrefixOf (self, other):
+        return self.match(other)
+
     def getChangeCount(self):
         """
         Get the change count, which is incremented each time this object is
@@ -587,12 +628,23 @@ class Name(object):
 
     # Python operators.
 
+    def __str__(self):
+        return self.toUri()
+
+    def __repr__(self):
+        return self.toUri()
+
     def __len__(self):
         return len(self._components)
 
     def __getitem__(self, key):
         if type(key) is int:
             return self._components[key]
+        elif type(key) is slice:
+            retval = Name()
+            for component in self._components[key]:
+                retval.append(component)
+            return retval
         else:
             raise ValueError("Unknown __getitem__ type: %s" % type(key))
 

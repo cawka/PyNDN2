@@ -6,11 +6,7 @@
 #
 
 from random import SystemRandom
-from pyndn.exclude import Exclude
-from pyndn.meta_info import ContentType
 from pyndn.forwarding_flags import ForwardingFlags
-from pyndn.key_locator import KeyLocatorType
-from pyndn.sha256_with_rsa_signature import Sha256WithRsaSignature
 from pyndn.util import Blob
 from pyndn.encoding.wire_format import WireFormat
 from pyndn.encoding.tlv.tlv_encoder import TlvEncoder
@@ -252,6 +248,31 @@ class Tlv0_1a2WireFormat(WireFormat):
 
         decoder.finishNestedTlvs(endOffset)
 
+    def encodeName(self, name):
+        """
+        Encode name in NDN-TLV and return the encoding.
+
+        :param Name name: The Name object to encode.
+        :return: A Blob containing the encoding.
+        :rtype: Blob
+        """
+        encoder = TlvEncoder(256)
+        self._encodeName(name, encoder)
+
+        return Blob(encoder.getOutput(), False)
+
+    def decodeName(self, name, input):
+        """
+        Decode input as an NDN-TLV name
+        object.
+
+        :param Name name: The Name object to be updated
+        :param input: The array with the bytes to decode.
+        :type input: An array type with int elements
+        """
+        decoder = TlvDecoder(input)
+        self._decodeName(name, decoder)
+
     @classmethod
     def get(self):
         """
@@ -344,6 +365,9 @@ class Tlv0_1a2WireFormat(WireFormat):
 
     @staticmethod
     def _encodeExclude(exclude, encoder):
+        # Deferred loading (otherwise there is circular import)
+        from pyndn.exclude import Exclude
+
         saveLength = len(encoder)
 
         # TODO: Do we want to order the components (except for ANY)?
@@ -381,6 +405,9 @@ class Tlv0_1a2WireFormat(WireFormat):
 
     @staticmethod
     def _encodeMetaInfo(metaInfo, encoder):
+        # Deferred loading (otherwise there is circular import)
+        from pyndn.meta_info import ContentType
+
         saveLength = len(encoder)
 
         # Encode backwards.
@@ -441,6 +468,9 @@ class Tlv0_1a2WireFormat(WireFormat):
 
     @staticmethod
     def _decodeSignatureInfo(data, decoder):
+        # Deferred loading (otherwise there is circular import)
+        from pyndn.sha256_with_rsa_signature import Sha256WithRsaSignature
+
         endOffset = decoder.readNestedTlvsStart(Tlv.SignatureInfo)
 
         signatureType = decoder.readNonNegativeIntegerTlv(Tlv.SignatureType)
@@ -462,6 +492,9 @@ class Tlv0_1a2WireFormat(WireFormat):
 
     @staticmethod
     def _encodeKeyLocator(keyLocator, encoder):
+        # Deferred loading (otherwise there is circular import)
+        from pyndn.key_locator import KeyLocatorType
+
         saveLength = len(encoder)
 
         # Encode backwards.
@@ -480,6 +513,9 @@ class Tlv0_1a2WireFormat(WireFormat):
 
     @staticmethod
     def _decodeKeyLocator(keyLocator, decoder):
+        # Deferred loading (otherwise there is circular import)
+        from pyndn.key_locator import KeyLocatorType
+
         endOffset = decoder.readNestedTlvsStart(Tlv.KeyLocator)
 
         keyLocator.clear()
