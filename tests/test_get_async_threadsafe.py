@@ -27,7 +27,7 @@ class Counter(object):
 
     def onTimeout(self, interest):
         self._callbackCount += 1
-        dump("Time out for interest", interest.getName().toUri()) 
+        dump("Time out for interest", interest.getName().toUri())
 
 def main():
     loop = asyncio.get_event_loop()
@@ -36,7 +36,7 @@ def main():
     counter = Counter()
     face.stopWhen(lambda: counter._callbackCount >= 1)
 
-    name1 = Name("/"); 
+    name1 = Name("/");
     dump("Express name ", name1.toUri())
     # This call to exressIinterest is thread safe because face is a ThreadsafeFace.
     face.expressInterest(name1, counter.onData, counter.onTimeout)

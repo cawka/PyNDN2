@@ -33,7 +33,7 @@ DEFAULT_PUBLIC_KEY_DER = bytearray([
 0xB8, 0x45, 0xED, 0xA4, 0x8C, 0xBD, 0x9C, 0xF1, 0x26, 0xA7, 0x23, 0x44, 0x5F, 0x0E, 0x19, 0x52, 0xD7, 0x32, 0x5A, 0x75,
 0xFA, 0xF5, 0x56, 0x14, 0x4F, 0x9A, 0x98, 0xAF, 0x71, 0x86, 0xB0, 0x27, 0x86, 0x85, 0xB8, 0xE2, 0xC0, 0x8B, 0xEA, 0x87,
 0x17, 0x1B, 0x4D, 0xEE, 0x58, 0x5C, 0x18, 0x28, 0x29, 0x5B, 0x53, 0x95, 0xEB, 0x4A, 0x17, 0x77, 0x9F, 0x02, 0x03, 0x01,
-0x00, 0x01  
+0x00, 0x01
   ])
 
 DEFAULT_PRIVATE_KEY_DER = bytearray([
@@ -73,14 +73,14 @@ DEFAULT_PRIVATE_KEY_DER = bytearray([
 def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
     """
     Loop to encode a data packet nIterations times.
-    
+
     :param int nIterations: The number of iterations.
-    :param bool useComplex: If true, use a large name, large content and all 
-      fields. If false, use a small name, small content and only required 
+    :param bool useComplex: If true, use a large name, large content and all
+      fields. If false, use a small name, small content and only required
       fields.
-    :param bool useCrypto: If true, sign the data packet.  If false, use a blank 
+    :param bool useCrypto: If true, sign the data packet.  If false, use a blank
       signature.
-    :return: A tuple (duration, encoding) where duration is the number of 
+    :return: A tuple (duration, encoding) where duration is the number of
       seconds for all iterations and encoding is the wire encoding.
     :rtype: (float, Blob)
     """
@@ -88,7 +88,7 @@ def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
         # Use a large name and content.
         name = Name(
           "/ndn/ucla.edu/apps/lwndn-test/numbers.txt/%FD%05%05%E8%0C%CE%1D/%00")
-        
+
         contentString = ""
         count = 1
         contentString += "%d" % count
@@ -102,11 +102,11 @@ def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
         name = Name("/test")
         content = Name.fromEscapedString("abc")
     finalBlockId = Name("/%00")[0]
-    
+
     # Initialize the private key storage in case useCrypto is true.
     identityStorage = MemoryIdentityStorage()
     privateKeyStorage = MemoryPrivateKeyStorage()
-    keyChain = KeyChain(IdentityManager(identityStorage, privateKeyStorage), 
+    keyChain = KeyChain(IdentityManager(identityStorage, privateKeyStorage),
                         SelfVerifyPolicyManager(identityStorage))
     keyName = Name("/testname/DSK-123")
     certificateName = keyName.getSubName(0, keyName.size() - 1).append(
@@ -114,7 +114,7 @@ def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
     identityStorage.addKey(keyName, KeyType.RSA, Blob(DEFAULT_PUBLIC_KEY_DER))
     privateKeyStorage.setKeyPairForKeyName(
       keyName, DEFAULT_PUBLIC_KEY_DER, DEFAULT_PRIVATE_KEY_DER)
-    
+
     # Set up signatureBits in case useCrypto is false.
     signatureBits = Blob(bytearray(128))
     emptyBlob = Blob([])
@@ -131,7 +131,7 @@ def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
             # This sets the signature fields.
             keyChain.sign(data, certificateName)
         else:
-            # Imitate IdentityManager.signByCertificate to set up the signature 
+            # Imitate IdentityManager.signByCertificate to set up the signature
             # fields, but don't sign.
             sha256Signature = data.getSignature()
             keyLocator = sha256Signature.getKeyLocator()
@@ -142,7 +142,7 @@ def benchmarkEncodeDataSeconds(nIterations, useComplex, useCrypto):
         encoding = data.wireEncode()
 
     finish = getNowSeconds()
-        
+
     return (finish - start, encoding)
 
 def onVerified(data):
@@ -155,16 +155,16 @@ def onVerifyFailed(data):
 def benchmarkDecodeDataSeconds(nIterations, useCrypto, encoding):
     """
     Loop to decode a data packet nIterations times.
-    
+
     :param int nIterations: The number of iterations.
-    :param bool useCrypto: If true, verify the signature.  If false, don't 
+    :param bool useCrypto: If true, verify the signature.  If false, don't
       verify.
     :param Blob encoding: The wire encoding to decode.
     """
     # Initialize the private key storage in case useCrypto is true.
     identityStorage = MemoryIdentityStorage()
     privateKeyStorage = MemoryPrivateKeyStorage()
-    keyChain = KeyChain(IdentityManager(identityStorage, privateKeyStorage), 
+    keyChain = KeyChain(IdentityManager(identityStorage, privateKeyStorage),
                         SelfVerifyPolicyManager(identityStorage))
     keyName = Name("/testname/DSK-123")
     certificateName = keyName.getSubName(0, keyName.size() - 1).append(
@@ -175,35 +175,35 @@ def benchmarkDecodeDataSeconds(nIterations, useCrypto, encoding):
     for i in range(nIterations):
         data = Data()
         data.wireDecode(encoding)
-        
+
         if useCrypto:
             keyChain.verifyData(data, onVerified, onVerifyFailed)
 
     finish = getNowSeconds()
- 
+
     return finish - start
-    
+
 def benchmarkEncodeDecodeData(useComplex, useCrypto):
     """
-    Call benchmarkEncodeDataSeconds and benchmarkDecodeDataSeconds with 
+    Call benchmarkEncodeDataSeconds and benchmarkDecodeDataSeconds with
     appropriate nInterations.  Print the results to stdout.
-    
+
     :param bool useComplex: See benchmarkEncodeDataSeconds.
     :param bool useCrypto: See benchmarkEncodeDataSeconds.
     """
     nIterations = 1000 if useCrypto else 20000
-    (duration, encoding) = benchmarkEncodeDataSeconds(nIterations, useComplex, 
+    (duration, encoding) = benchmarkEncodeDataSeconds(nIterations, useComplex,
                                                       useCrypto)
-    print("Encode " + ("complex" if useComplex else "simple ") + 
+    print("Encode " + ("complex" if useComplex else "simple ") +
           " data: Crypto? " + ("yes" if useCrypto else "no ") +
-          ", Duration sec, Hz: " + repr(duration) + ", " + 
+          ", Duration sec, Hz: " + repr(duration) + ", " +
           repr(nIterations / duration))
 
     nIterations = 5000 if useCrypto else 20000
     duration = benchmarkDecodeDataSeconds(nIterations, useCrypto, encoding)
-    print("Decode " + ("complex" if useComplex else "simple ") + 
+    print("Decode " + ("complex" if useComplex else "simple ") +
           " data: Crypto? " + ("yes" if useCrypto else "no ") +
-          ", Duration sec, Hz: " + repr(duration) + ", " + 
+          ", Duration sec, Hz: " + repr(duration) + ", " +
           repr(nIterations / duration))
 
 def main():

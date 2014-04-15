@@ -6,7 +6,7 @@
 #
 
 """
-This module defines the IdentityManager class which is the interface of 
+This module defines the IdentityManager class which is the interface of
 operations related to identity, keys, and certificates.
 """
 
@@ -16,24 +16,24 @@ from pyndn import KeyLocatorType
 
 class IdentityManager(object):
     """
-    Create a new IdentityManager to use the identityStorage and 
+    Create a new IdentityManager to use the identityStorage and
     privateKeyStorage.
-    
-    :param IdentityStorage identityStorage: An object of a subclass of 
+
+    :param IdentityStorage identityStorage: An object of a subclass of
       IdentityStorage.
-    :param PrivateKeyStorage privateKeyStorage: An object of a subclass of 
+    :param PrivateKeyStorage privateKeyStorage: An object of a subclass of
       PrivateKeyStorage.
     """
     def __init__(self, identityStorage, privateKeyStorage):
         self._identityStorage = identityStorage
         self._privateKeyStorage = privateKeyStorage
-        
+
     def signByCertificate(self, data, certificateName, wireFormat = None):
         """
         Sign data packet based on the certificate name.
 
         :param Data data: The Data object to sign and update its signature.
-        :param Name certificateName: The Name identifying the certificate which 
+        :param Name certificateName: The Name identifying the certificate which
           identifies the signing key.
         :param wireFormat: (optional) The WireFormat for calling encodeData, or
           WireFormat.getDefaultWireFormat() if omitted.
@@ -55,19 +55,19 @@ class IdentityManager(object):
 
         # Encode once to get the signed portion.
         encoding = data.wireEncode(wireFormat)
-  
+
         signature.setSignature(self._privateKeyStorage.sign
           (encoding.toSignedBuffer(), keyName))
 
         # Encode again to include the signature.
         data.wireEncode(wireFormat)
-        
+
     # TODO: Move this to IdentityCertificate
     @staticmethod
     def certificateNameToPublicKeyName(certificateName):
         """
         Get the public key name from the full certificate name.
-        
+
         :param Name certificateName: The full certificate name.
         :return: The related public key name.
         :rtype: Name

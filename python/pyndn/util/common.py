@@ -35,8 +35,8 @@ class Common(object):
     def getNowMilliseconds():
         """
         Get the current time in milliseconds.
-        
-        :return: The current time in milliseconds since 1/1/1970, including 
+
+        :return: The current time in milliseconds since 1/1/1970, including
           fractions of a millisecond.
         :rtype: float
         """
@@ -54,4 +54,3 @@ class Common(object):
         else:
             # Assume value is a Python 3 bytes object. Convert to str.
             return "".join(map(_bytesElementToChr, bytesIO.getvalue()))
-        

@@ -6,7 +6,7 @@
 #
 
 """
-This module defines the Sha256WithRsaSignature class which extends Signature and 
+This module defines the Sha256WithRsaSignature class which extends Signature and
 holds the signature bits and other info representing a SHA256-with-RSA signature
 in a data packet.
 """
@@ -18,10 +18,10 @@ from pyndn.key_locator import KeyLocator
 
 class Sha256WithRsaSignature(Signature):
     """
-    Create a new Sha256WithRsaSignature object, possibly copying values from 
+    Create a new Sha256WithRsaSignature object, possibly copying values from
     another object.
-    
-    :param value: (optional) If value is a Sha256WithRsaSignature, copy its 
+
+    :param value: (optional) If value is a Sha256WithRsaSignature, copy its
       values.  If value is omitted, the keyLocator is the default with
       unspecified values and the signature is unspecified.
     :param value: Sha256WithRsaSignature
@@ -38,9 +38,9 @@ class Sha256WithRsaSignature(Signature):
             raise RuntimeError(
               "Unrecognized type for Sha256WithRsaSignature constructor: " +
               repr(type(value)))
-            
+
         self._changeCount = 0
-            
+
     def clone(self):
         """
         Create a new Sha256WithRsaSignature which is a copy of this object.
@@ -53,7 +53,7 @@ class Sha256WithRsaSignature(Signature):
     def getKeyLocator(self):
         """
         Get the key locator.
-        
+
         :return: The key locator.
         :rtype: KeyLocator
         """
@@ -62,42 +62,42 @@ class Sha256WithRsaSignature(Signature):
     def getSignature(self):
         """
         Get the data packet's signature bytes.
-        
+
         :return: The signature bytes as a Blob, which maybe isNull().
         :rtype: Blob
         """
         return self._signature
-    
+
     def setKeyLocator(self, keyLocator):
         """
         Set the key locator to a copy of the given keyLocator.
-        
+
         :param KeyLocator keyLocator: The KeyLocator to copy.
         """
-        self._keyLocator.set(KeyLocator(keyLocator)) 
+        self._keyLocator.set(KeyLocator(keyLocator))
         self._changeCount += 1
 
     def setSignature(self, signature):
         """
         Set the signature bytes to the given value.
-        
-        :param signature: The array with the signature bytes. If signature is 
-          not a Blob, then create a new Blob to copy the bytes (otherwise 
+
+        :param signature: The array with the signature bytes. If signature is
+          not a Blob, then create a new Blob to copy the bytes (otherwise
           take another pointer to the same Blob).
-        :type signature: A Blob or an array type with int elements 
+        :type signature: A Blob or an array type with int elements
         """
-        self._signature = (signature if type(signature) is Blob 
+        self._signature = (signature if type(signature) is Blob
                            else Blob(signature))
         self._changeCount += 1
 
     def clear(self):
         self._keyLocator.get().clear()
         self._signature = Blob()
-        self._changeCount += 1        
+        self._changeCount += 1
 
     def getChangeCount(self):
         """
-        Get the change count, which is incremented each time this object 
+        Get the change count, which is incremented each time this object
         (or a child object) is changed.
 
         :return: The change count.

@@ -17,7 +17,7 @@ the fields of an NDN Exclude selector.
 class Exclude(object):
     """
     Create a new Interest object, possibly copying values from another object.
-    
+
     :param Exclude value: (optional) If value is an Exclude, copy its values.  If
       value is omitted, this creates an object with no entries.
     """
@@ -31,7 +31,7 @@ class Exclude(object):
             raise RuntimeError(
               "Unrecognized type for Interest constructor: " +
               repr(type(value)))
-                    
+
         self._changeCount = 0
 
     ANY = 0
@@ -40,11 +40,11 @@ class Exclude(object):
     class Entry(object):
         """
         Create a new Exclude.Entry.
-        
+
         :param value: (optional) If value is omitted, create an Exclude.Entry of
-          type Exclude.ANY.  Otherwise creat an Exclude.Entry of type 
+          type Exclude.ANY.  Otherwise creat an Exclude.Entry of type
           Exclude.COMPONENT with the value.
-        :type value: Name.Component or a value for the Name.Component 
+        :type value: Name.Component or a value for the Name.Component
           constructor
         """
         def __init__(self, value = None):
@@ -59,60 +59,60 @@ class Exclude(object):
         def getType(self):
             """
             Get the type of this Exclude.Entry.
-            
+
             :return: The type of this entry which is Exclude.ANY or
               Exclude.COMPONENT.
             :rtype: int
             """
             return self._type
-        
+
         def getComponent(self):
             """
-            Get the component for this Exclude.Entry (if the type of this 
+            Get the component for this Exclude.Entry (if the type of this
               is Exclude.COMPONENT).
-            
+
             :return: The component for this entry, or None if the type of
               this entry is not Exclude.COMPONENT.
             :rtype: Name.Component
             """
             return self._component
-        
+
     def size(self):
         """
         Get the number of entries.
-        
+
         :return: The number of entries.
         :rtype: int
         """
         return len(self._entries)
-    
+
     def get(self, i):
         """
         Get the entry at the given index.
-        
+
         :param int i: The index of the entry, starting from 0.
         :return: The entry at the index.
         :rtype: Exclude.Entry
         """
         self._entries[i]
-        
+
     def appendAny(self):
         """
         Append a new entry of type Exclude.ANY.
-        
+
         :return: This Exclude so that you can chain calls to append.
         :rype: Exclude
         """
         self._entries.append(Exclude.Entry())
         self._changeCount += 1
         return self
-        
+
     def appendComponent(self, component):
         """
         Append a new entry of type Exclude.COMPONENT with the give component.
-        
+
         :param component: The new exclude component.
-        :type component: Exclude.Entry, Name.Component or a value for the 
+        :type component: Exclude.Entry, Name.Component or a value for the
           Name.Component constructor
         :return: This Exclude so that you can chain calls to append.
         :rype: Exclude
@@ -134,27 +134,27 @@ class Exclude(object):
     def toUri(self):
         """
         Return a string representation of the exclude values.
-        
+
         :return: The string representation.
         :rtype: string
         """
         if len(self._entries) == 0:
             return ""
-  
+
         result = BytesIO()
         didFirst = False
         for entry in self._entries:
             if didFirst:
                 # write is required to take a byte buffer.
                 result.write(Exclude._comma)
-                
+
             if entry.getType() == Exclude.ANY:
                 # write is required to take a byte buffer.
                 result.write(Exclude._star)
             else:
                 entry.getComponent().toEscapedString(result)
             didFirst = True
-  
+
         return Common.getBytesIOString(result)
 
     @staticmethod
@@ -162,10 +162,10 @@ class Exclude(object):
         """
         Compare the components using NDN component ordering. A component is less
         if it is shorter, otherwise if equal length do a byte comparison.
-        
+
         :param Name.Component component1: The first name component.
         :param Name.Component component2: The first name component.
-        :return: -1 if component1 is less than component2, 1 if greater or 0 
+        :return: -1 if component1 is less than component2, 1 if greater or 0
           if equal.
         :rtype: int
         """
@@ -176,7 +176,7 @@ class Exclude(object):
         if len(buf1) > len(buf2):
             return 1
 
-        # The components are equal length.  Just do a byte compare.  
+        # The components are equal length.  Just do a byte compare.
         # The Blob buf() is a memoryview which we can't compare.  We could copy
         #   into a bytearray for comparison but that is inefficient.  So, just
         #   directly use normal loop.
@@ -185,15 +185,15 @@ class Exclude(object):
                 return -1
             if buf1[i] > buf2[i]:
                 return 1
-            
+
         return 0
 
     def matches(self, component):
         """
         Check if the component matches any of the exclude criteria.
-        
+
         :param Name.Component component: The name component to check.
-        :return: True if the component matches any of the exclude criteria, 
+        :return: True if the component matches any of the exclude criteria,
           otherwise False.
         """
         i = 0
@@ -203,19 +203,19 @@ class Exclude(object):
                 if i > 0:
                     lowerBound = self._entries[i - 1]
 
-                # Find the upper bound, possibly skipping over multiple ANY in 
+                # Find the upper bound, possibly skipping over multiple ANY in
                 #  a row.
                 upperBound = None
                 iUpperBound = i + 1
                 while iUpperBound < len(self._entries):
                     if self._entries[iUpperBound].getType() == Exclude.COMPONENT:
                         upperBound = self._entries[iUpperBound]
-                        break                    
+                        break
                     iUpperBound += 1
 
-                # If lowerBound != 0, we already checked component equals 
+                # If lowerBound != 0, we already checked component equals
                 #   lowerBound on the last pass.
-                # If upperBound != 0, we will check component equals upperBound 
+                # If upperBound != 0, we will check component equals upperBound
                 #   on the next pass.
                 if upperBound != None:
                     if lowerBound != None:
@@ -239,20 +239,20 @@ class Exclude(object):
                     else:
                         # this.values has only ANY.
                         return True
-            else: 
+            else:
                 if (self.compareComponents(
                       component, self._entries[i].getComponent()) == 0):
                     return True
-            
-            i +=1 
 
-        return False        
+            i +=1
+
+        return False
 
     def getChangeCount(self):
         """
-        Get the change count, which is incremented each time this object is 
+        Get the change count, which is incremented each time this object is
         changed.
-        
+
         :return: The change count.
         :rtype: int
         """
@@ -262,7 +262,7 @@ class Exclude(object):
 
     def __len__(self):
         return len(self._entries)
-        
+
     def __getitem__(self, key):
         if type(key) is int:
             return self._entries[key]

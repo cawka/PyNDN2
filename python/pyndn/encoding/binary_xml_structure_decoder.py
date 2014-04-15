@@ -30,16 +30,16 @@ class BinaryXmlStructureDecoder(object):
 
     READ_HEADER_OR_CLOSE = 0
     READ_BYTES = 1
-    
+
     def findElementEnd(self, input):
         """
-        Continue scanning input starting from self._offset to find the element 
-        end.  If the end of the element which started at offset 0 is found, 
-        this returns True and getOffset() is the length of the element.  
-        Otherwise, this returns False which means you should read more into 
+        Continue scanning input starting from self._offset to find the element
+        end.  If the end of the element which started at offset 0 is found,
+        this returns True and getOffset() is the length of the element.
+        Otherwise, this returns False which means you should read more into
         input and call again.
-        
-        :param input: The input buffer. You have to pass in input each time 
+
+        :param input: The input buffer. You have to pass in input each time
           because the buffer could be reallocated.
         :type input: An array type with int elements
         :return: True if found the element end, False if not.
@@ -56,9 +56,9 @@ class BinaryXmlStructureDecoder(object):
                 # All the cases assume we have some input.
                 return False
 
-            if self._state == BinaryXmlStructureDecoder.READ_HEADER_OR_CLOSE:                             
+            if self._state == BinaryXmlStructureDecoder.READ_HEADER_OR_CLOSE:
                 # First check for CLOSE.
-                if (self._headerLength == 0 and 
+                if (self._headerLength == 0 and
                     input[self._offset] == BinaryXmlDecoder.CLOSE):
                     self._offset += 1
                     # Close the level.
@@ -70,7 +70,7 @@ class BinaryXmlStructureDecoder(object):
 
                     if self._level < 0:
                         raise RuntimeError(
-                  "BinaryXmlStructureDecoder: Unexpected close tag at offset " + 
+                  "BinaryXmlStructureDecoder: Unexpected close tag at offset " +
                           repr(self._offset - 1))
 
                     # Get ready for the next header.
@@ -80,12 +80,12 @@ class BinaryXmlStructureDecoder(object):
                 startingHeaderLength = self._headerLength
                 while True:
                     if self._offset >= len(input):
-                        # We can't get all of the header bytes from this input. 
+                        # We can't get all of the header bytes from this input.
                         # Save in headerBuffer.
                         self._useHeaderBuffer = True
                         nNewBytes = self._headerLength - startingHeaderLength
                         self._headerBuffer.copy(
-                          input[self._offset - nNewBytes:self._offset], 
+                          input[self._offset - nNewBytes:self._offset],
                           startingHeaderLength)
 
                         return False
@@ -101,7 +101,7 @@ class BinaryXmlStructureDecoder(object):
                     # Copy the remaining bytes into headerBuffer.
                     nNewBytes = self._headerLength - startingHeaderLength
                     self._headerBuffer.copy(
-                      input[self._offset - nNewBytes:self._offset], 
+                      input[self._offset - nNewBytes:self._offset],
                       startingHeaderLength)
 
                     (type, value) = BinaryXmlDecoder(
@@ -114,15 +114,15 @@ class BinaryXmlStructureDecoder(object):
                 # Set the next state based on the type.
                 if type == BinaryXmlDecoder.DATTR:
                     # We already consumed the item. READ_HEADER_OR_CLOSE again.
-                    # ndnb has rules about what must follow an attribute, but we 
+                    # ndnb has rules about what must follow an attribute, but we
                     # are just scanning.
                     self._startHeader()
-                elif (type == BinaryXmlDecoder.DTAG or 
+                elif (type == BinaryXmlDecoder.DTAG or
                       type == BinaryXmlDecoder.EXT):
                     # Start a new level and READ_HEADER_OR_CLOSE again.
                     self._level += 1
                     self._startHeader()
-                elif (type == BinaryXmlDecoder.TAG or 
+                elif (type == BinaryXmlDecoder.TAG or
                       type == BinaryXmlDecoder.ATTR):
                     if type == BinaryXmlDecoder.TAG:
                         # Start a new level and read the tag.
@@ -130,7 +130,7 @@ class BinaryXmlStructureDecoder(object):
                     # Minimum tag or attribute length is 1.
                     self._nBytesToRead = value + 1
                     self._state = BinaryXmlStructureDecoder.READ_BYTES
-                    # ndnb has rules about what must follow an attribute, but we 
+                    # ndnb has rules about what must follow an attribute, but we
                     # are just scanning.
                 elif (type == BinaryXmlDecoder.BLOB or
                       type == BinaryXmlDecoder.UDATA):
@@ -138,7 +138,7 @@ class BinaryXmlStructureDecoder(object):
                     self._state = BinaryXmlStructureDecoder.READ_BYTES
                 else:
                     raise RuntimeError(
-                      "BinaryXmlStructureDecoder: Unrecognized header type " + 
+                      "BinaryXmlStructureDecoder: Unrecognized header type " +
                       repr(type))
             elif self._state == BinaryXmlStructureDecoder.READ_BYTES:
                 nRemainingBytes = len(input) - self._offset
@@ -154,32 +154,31 @@ class BinaryXmlStructureDecoder(object):
             else:
                 # We don't expect this to happen.
                 raise RuntimeError(
-                  "BinaryXmlStructureDecoder: Unrecognized state " + 
+                  "BinaryXmlStructureDecoder: Unrecognized state " +
                   repr(self._state))
-    
+
     def getOffset(self):
         """
         Get the current offset into the input buffer.
-        
+
         :return: The offset.
         :rtype: int
         """
         return self._offset
-    
+
     def seek(self, offset):
         """
         Set the offset into the input, used for the next read.
-        
+
         :param int offset: The new offset.
         """
         self._offset = offset
-        
+
     def _startHeader(self):
         """
-        A private method to set the state to READ_HEADER_OR_CLOSE and set up to 
+        A private method to set the state to READ_HEADER_OR_CLOSE and set up to
         start reading the header.
         """
         self._headerLength = 0
         self._useHeaderBuffer = False
         self._state = BinaryXmlStructureDecoder.READ_HEADER_OR_CLOSE
-        

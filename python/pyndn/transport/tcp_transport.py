@@ -33,44 +33,44 @@ class TcpTransport(Transport):
 
     class ConnectionInfo(Transport.ConnectionInfo):
         """
-        Create a new TcpTransport.ConnectionInfo which extends 
-        Transport.ConnectionInfo to hold the host and port info for the TCP 
+        Create a new TcpTransport.ConnectionInfo which extends
+        Transport.ConnectionInfo to hold the host and port info for the TCP
         connection.
-        
+
         :param str host: The host for the connection.
-        :param int port: (optional) The port number for the connection. If 
+        :param int port: (optional) The port number for the connection. If
           omitted, use 6363.
         """
         def __init__(self, host, port = 6363):
             self._host = host
             self._port = port
-            
+
         def getHost(self):
             """
             Get the host given to the constructor.
-            
+
             :return: The host.
             :rtype: str
             """
             return self._host
-        
+
         def getPort(self):
             """
             Get the port given to the constructor.
-            
+
             :return: The port.
             :rtype: int
             """
             return self._port
-                
+
     def connect(self, connectionInfo, elementListener):
         """
-        Connect according to the info in connectionInfo, and use 
+        Connect according to the info in connectionInfo, and use
         elementListener.
-        
-        :param TcpTransport.ConnectionInfo connectionInfo: A 
+
+        :param TcpTransport.ConnectionInfo connectionInfo: A
           TcpTransport.ConnectionInfo.
-        :param elementListener: The elementListener must remain valid during the 
+        :param elementListener: The elementListener must remain valid during the
           life of this object.
         :type elementListener: An object with onReceivedData
         """
@@ -78,7 +78,7 @@ class TcpTransport(Transport):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect(
           (connectionInfo.getHost(), connectionInfo.getPort()))
-          
+
         if hasattr(select, "poll"):
             # Set up _poll.  (Ubuntu, etc.)
             self._poll = select.poll()
@@ -88,21 +88,21 @@ class TcpTransport(Transport):
             self._kqueue = select.kqueue()
             self._kevents = [select.kevent(
               self._socket.fileno(), filter = select.KQ_FILTER_READ,
-              flags = select.KQ_EV_ADD | select.KQ_EV_ENABLE | 
+              flags = select.KQ_EV_ADD | select.KQ_EV_ENABLE |
                       select.KQ_EV_CLEAR)]
         elif not hasattr(select, "select"):
             # Most Python implementations have this fallback, so we
             #   don't expect this error.
             raise RuntimeError("Cannot find a polling utility for sockets")
-          
+
         self._elementReader = ElementReader(elementListener)
-    
+
     # This will be set True if send gets a TypeError.
     _sendNeedsStr = False
     def send(self, data):
         """
         Set data to the host.
-        
+
         :param data: The buffer of data to send.
         :type data: An array type accepted by socket.send
         """
@@ -119,14 +119,14 @@ class TcpTransport(Transport):
 
     def processEvents(self):
         """
-        Process any data to receive.  For each element received, call 
+        Process any data to receive.  For each element received, call
         elementListener.onReceivedElement.
-        This is non-blocking and will silently time out after a brief period if 
+        This is non-blocking and will silently time out after a brief period if
         there is no data to receive.
         You should repeatedly call this from an event loop.
-        You should normally not call this directly since it is called by 
+        You should normally not call this directly since it is called by
         Face.processEvents.
-        If you call this from an main event loop, you may want to catch and 
+        If you call this from an main event loop, you may want to catch and
         log/disregard all exceptions.
         """
         if not self.getIsConnected():
@@ -156,7 +156,7 @@ class TcpTransport(Transport):
                 if len(isReady) == 0:
                     # There is no data waiting.
                     return
-            
+
             nBytesRead = self._socket.recv_into(self._buffer)
             if nBytesRead <= 0:
                 # Since we checked for data ready, we don't expect this.
@@ -168,16 +168,16 @@ class TcpTransport(Transport):
     def getIsConnected(self):
         """
         Check if the transport is connected.
-        
+
         :return: True if connected.
         :rtype: bool
         """
         if self._socket == None:
             return False
-        
+
         # Assume we are still connected.  TODO: Do a test receive?
         return True
-        
+
     def close(self):
         """
         Close the connection.  If not connected, this does nothing.
@@ -186,10 +186,9 @@ class TcpTransport(Transport):
             if self._poll != None:
                 self._poll.unregister(self._socket.fileno())
                 self._poll = None
-                
+
             self._kqueue = None
             self._kevents = None
-            
+
             self._socket.close()
-            self._socket = None            
-            
+            self._socket = None

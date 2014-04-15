@@ -27,11 +27,11 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
         self._publicKeyStore = {}
         # The key is the keyName.toUri()
         self._privateKeyStore = {}
-        
+
     def setKeyPairForKeyName(self, keyName, publicKeyDer, privateKeyDer):
         """
         Set the public and private key for the keyName.
-        
+
         :param Name keyName: The key name.
         :param publicKeyDer: The public key DER byte array.
         :type publicKeyDer: str, or an array type with int elements which is
@@ -43,15 +43,15 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
         if not type(publicKeyDer) is str:
             publicKeyDer = "".join(map(chr, publicKeyDer))
         self._publicKeyStore[keyName.toUri()] = RSA.importKey(publicKeyDer)
-        
+
         if not type(privateKeyDer) is str:
             privateKeyDer = "".join(map(chr, privateKeyDer))
         self._privateKeyStore[keyName.toUri()] = RSA.importKey(privateKeyDer)
-        
+
     def getPublicKey(self, keyName):
         """
         Get the public key with the keyName.
-        
+
         :param Name keyName: The name of public key.
         :return: The public key.
         :rtype: PublicKey
@@ -59,14 +59,14 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
         keyNameUri = keyName.toUri()
         if not (keyNameUri in self._publicKeyStore):
             raise SecurityException(
-              "MemoryPrivateKeyStorage: Cannot find public key " + 
+              "MemoryPrivateKeyStorage: Cannot find public key " +
               keyName.toUri())
-              
+
         return self._publicKeyStore[keyNameUri]
 
     def sign(self, data, keyName, digestAlgorithm = DigestAlgorithm.SHA256):
         """
-        Fetch the private key for keyName and sign the data, returning a 
+        Fetch the private key for keyName and sign the data, returning a
         signature Blob.
 
         :param data: The input byte buffer to sign.
@@ -88,7 +88,7 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
           raise SecurityException(
             "MemoryPrivateKeyStorage: Cannot find private key " + keyUri)
         privateKey = self._privateKeyStore[keyUri]
-        
+
         # Sign the hash of the data.
         if sys.version_info[0] == 2:
             # In Python 2.x, we need a str.  Use Blob to convert data.
@@ -96,13 +96,13 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
         signature = PKCS1_v1_5.new(privateKey).sign(SHA256.new(data))
         # Convert the string to a Blob.
         return Blob(bytearray(signature), False)
-        
+
     def doesKeyExist(self, keyName, keyClass):
         """
         Check if a particular key exists.
-        
+
         :param Name keyName: The name of the key.
-        :param keyClass: The class of the key, e.g. KeyClass.PUBLIC, 
+        :param keyClass: The class of the key, e.g. KeyClass.PUBLIC,
            KeyClass.PRIVATE, or KeyClass.SYMMETRIC.
         :type keyClass: int from KeyClass
         :return: True if the key exists, otherwise false.
@@ -115,4 +115,4 @@ class MemoryPrivateKeyStorage(PrivateKeyStorage):
           return keyUri in self._privateKeyStore
         else:
           # KeyClass.SYMMETRIC not implemented yet.
-          return False 
+          return False

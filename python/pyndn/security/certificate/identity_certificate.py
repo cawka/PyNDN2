@@ -10,7 +10,7 @@ class IdentityCertificate(object):
     def certificateNameToPublicKeyName(certificateName):
         """
         Get the public key name from the full certificate name.
-        
+
         :param Name certificateName: The full certificate name.
         :return: The related public key name.
         :rtype: Name
@@ -22,7 +22,7 @@ class IdentityCertificate(object):
                 break
             i -= 1
 
-        tmpName = certificateName.getSubName(0, i)        
+        tmpName = certificateName.getSubName(0, i)
         keyString = "KEY"
         for i in range(tmpName.size()):
             if tmpName.get(i).toEscapedString() == keyString:

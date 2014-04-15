@@ -16,10 +16,10 @@ from pyndn.name import Name
 
 class KeyLocator(object):
     """
-    Create a new KeyLocator object, possibly copying values from 
+    Create a new KeyLocator object, possibly copying values from
     another object.
-    
-    :param KeyLocator value: (optional) If value is a KeyLocator, copy its 
+
+    :param KeyLocator value: (optional) If value is a KeyLocator, copy its
       values.  If value is omitted, set the fields to unspecified.
     """
     def __init__(self, value = None):
@@ -36,7 +36,7 @@ class KeyLocator(object):
             raise RuntimeError(
               "Unrecognized type for KeyLocator constructor: " +
               repr(type(value)))
-            
+
         self._changeCount = 0
 
     def getType(self):
@@ -44,17 +44,17 @@ class KeyLocator(object):
         Get the key locator type. If KeyLocatorType.KEYNAME, you may also
         getKeyName().  If KeyLocatorType.KEY_LOCATOR_DIGEST, you may also
         getKeyData() to get the digest.
-        
+
         :return: The key locator type, or None if not specified.
         :rtype: an int from KeyLocatorType
         """
         return self._type
-        
+
     def getKeyName(self):
         """
         Get the key name.  This is meaningful if getType() is
         KeyLocatorType.KEYNAME.
-        
+
         :return: The key name. If not specified, the Name is empty.
         :rtype: Name
         """
@@ -64,7 +64,7 @@ class KeyLocator(object):
         """
         Get the key data.  This is the digest bytes if getType() is
         KeyLocatorType.KEY_LOCATOR_DIGEST.
-        
+
         :return: The key data as a Blob, which isNull() if unspecified.
         :rtype: Blob
         """
@@ -75,32 +75,32 @@ class KeyLocator(object):
         Set the key locator type.  If KeyLocatorType.KEYNAME, you must also
         setKeyName().  If KeyLocatorType.KEY_LOCATOR_DIGEST, you must also
         setKeyData() to the digest.
-        
+
         :param type: The key locator type.  If None, the type is unspecified.
         :type type: an int from KeyLocatorType
         """
         self._type = None if type == None or type < 0 else type
         self._changeCount += 1
-        
+
     def setKeyName(self, keyName):
         """
-        Set key name to a copy of the given Name.  This is the name if 
+        Set key name to a copy of the given Name.  This is the name if
         getType() is KeyLocatorType.KEYNAME.
-        
+
         :param Name keyName: The key name which is copied.
         """
         self._keyName.set(keyName if type(keyName) is Name else Name(keyName))
         self._changeCount += 1
-        
+
     def setKeyData(self, keyData):
         """
-        Set the key data to the given value.  This is the digest bytes if 
+        Set the key data to the given value.  This is the digest bytes if
         getType() is KeyLocatorType.KEY_LOCATOR_DIGEST.
-        
-        :param keyData: The array with the key data bytes. If keyData is not a 
-          Blob, then create a new Blob to copy the bytes (otherwise 
+
+        :param keyData: The array with the key data bytes. If keyData is not a
+          Blob, then create a new Blob to copy the bytes (otherwise
           take another pointer to the same Blob).
-        :type keyData: A Blob or an array type with int elements 
+        :type keyData: A Blob or an array type with int elements
         """
         self._keyData = keyData if type(keyData) is Blob else Blob(keyData)
         self._changeCount += 1
@@ -116,9 +116,9 @@ class KeyLocator(object):
 
     def getChangeCount(self):
         """
-        Get the change count, which is incremented each time this object 
+        Get the change count, which is incremented each time this object
         (or a child object) is changed.
-        
+
         :return: The change count.
         :rtype: int
         """

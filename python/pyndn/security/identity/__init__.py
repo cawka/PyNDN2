@@ -4,7 +4,7 @@
 # Author: Jeff Thompson <jefft0@remap.ucla.edu>
 # See COPYING for copyright and distribution information.
 
-__all__ = ['identity_manager', 'identity_storage', 'memory_identity_storage', 
+__all__ = ['identity_manager', 'identity_storage', 'memory_identity_storage',
            'memory_private_key_storage', 'private_key_storage']
 
 import sys as _sys

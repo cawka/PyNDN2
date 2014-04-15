@@ -46,7 +46,7 @@ def dumpInterest(interest):
          interest.getMaxSuffixComponents()
          if interest.getMaxSuffixComponents() != None else "<none>")
     if interest.getKeyLocator().getType() != None:
-        if (interest.getKeyLocator().getType() == 
+        if (interest.getKeyLocator().getType() ==
             KeyLocatorType.KEY_LOCATOR_DIGEST):
             dump("keyLocator: KeyLocatorDigest:",
                  interest.getKeyLocator().getKeyData().toHex())
@@ -71,17 +71,17 @@ def dumpInterest(interest):
     dump("lifetimeMilliseconds:",
          "<none>" if interest.getInterestLifetimeMilliseconds() == None
                   else interest.getInterestLifetimeMilliseconds())
-  
+
 def main():
     interest = Interest()
     interest.wireDecode(TlvInterest)
     dump("Interest:")
     dumpInterest(interest)
-    
+
     encoding = interest.wireEncode()
     dump("")
     dump("Re-encoded interest", encoding.toHex())
-    
+
     reDecodedInterest = Interest()
     reDecodedInterest.wireDecode(encoding)
     dump("Re-decoded Interest:")
@@ -94,7 +94,7 @@ def main():
     freshInterest.setMaxSuffixComponents(6)
     freshInterest.getKeyLocator().setType(KeyLocatorType.KEY_LOCATOR_DIGEST)
     freshInterest.getKeyLocator().setKeyData(bytearray(
-      [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 
+      [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F]))
     freshInterest.getExclude().appendComponent(Name("abc")[0]).appendAny()
     freshInterest.setInterestLifetimeMilliseconds(30000)

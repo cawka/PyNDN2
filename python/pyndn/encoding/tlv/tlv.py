@@ -6,7 +6,7 @@
 #
 
 """
-This module defines the Tlv class with type codes for the NDN-TLV wire format.  
+This module defines the Tlv class with type codes for the NDN-TLV wire format.
 """
 
 class Tlv(object):

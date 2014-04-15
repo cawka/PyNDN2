@@ -6,19 +6,19 @@
 #
 
 """
-This module defines the ForwardingFlags class which holds the flags which 
-specify how the forwarding daemon should forward an interest for a registered 
+This module defines the ForwardingFlags class which holds the flags which
+specify how the forwarding daemon should forward an interest for a registered
 prefix.  We use a separate ForwardingFlags object to retain future compatibility
 if the daemon forwarding bits are changed, amended or deprecated.
 """
 
 class ForwardingFlags(object):
     """
-    Create a new ForwardingFlags object, possibly copying values from another 
+    Create a new ForwardingFlags object, possibly copying values from another
     object.
-    
-    :param ForwardingFlags value: (optional) If value is a ForwardingFlags, copy 
-      its values.  If value is omitted, the type is the default with "active" 
+
+    :param ForwardingFlags value: (optional) If value is a ForwardingFlags, copy
+      its values.  If value is omitted, the type is the default with "active"
       and "childInherit" True and other flags False.
     """
     def __init__(self, value = None):
@@ -57,9 +57,9 @@ class ForwardingFlags(object):
 
     def getForwardingEntryFlags(self):
         """
-        Get an integer with the bits set according to the flags as used by the 
+        Get an integer with the bits set according to the flags as used by the
         ForwardingEntry message.
-        
+
         :return: An integer with the bits set.
         :rtype: int
         """
@@ -83,29 +83,29 @@ class ForwardingFlags(object):
             result |= ForwardingFlags.CAPTURE_OK
 
         return result
-    
+
     def setForwardingEntryFlags(self, forwardingEntryFlags):
         """
-        Set the flags according to the bits in forwardingEntryFlags as used by 
+        Set the flags according to the bits in forwardingEntryFlags as used by
         the ForwardingEntry message.
-        
+
         :param int forwardingEntryFlags: An integer with the bits set.
         """
-        self._active = True if (forwardingEntryFlags & 
+        self._active = True if (forwardingEntryFlags &
                                 ForwardingFlags.ACTIVE) else False
-        self._childInherit = True if (forwardingEntryFlags & 
+        self._childInherit = True if (forwardingEntryFlags &
                                       ForwardingFlags.CHILD_INHERIT) else False
-        self._advertise = True if (forwardingEntryFlags & 
+        self._advertise = True if (forwardingEntryFlags &
                                    ForwardingFlags.ADVERTISE) else False
-        self._last = True if (forwardingEntryFlags & 
+        self._last = True if (forwardingEntryFlags &
                               ForwardingFlags.LAST) else False
-        self._capture = True if (forwardingEntryFlags & 
+        self._capture = True if (forwardingEntryFlags &
                                  ForwardingFlags.CAPTURE) else False
-        self._local = True if (forwardingEntryFlags & 
+        self._local = True if (forwardingEntryFlags &
                                ForwardingFlags.LOCAL) else False
-        self._tap = True if (forwardingEntryFlags & 
+        self._tap = True if (forwardingEntryFlags &
                              ForwardingFlags.TAP) else False
-        self._captureOk = True if (forwardingEntryFlags & 
+        self._captureOk = True if (forwardingEntryFlags &
                                    ForwardingFlags.CAPTURE_OK) else False
 
     def getActive(self):

@@ -6,8 +6,8 @@
 # Author: Jeff Thompson <jefft0@remap.ucla.edu>
 # See COPYING for copyright and distribution information.
 
-__all__ = ['data', 'exclude', 'face', 'forwarding_entry', 'forwarding_flags', 
-           'interest', 'key_locator', 'meta_info', 'name', 
+__all__ = ['data', 'exclude', 'face', 'forwarding_entry', 'forwarding_flags',
+           'interest', 'key_locator', 'meta_info', 'name',
            'sha256_with_rsa_signature', 'signature', 'threadsafe_face']
 
 import sys as _sys

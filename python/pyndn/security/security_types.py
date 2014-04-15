@@ -21,7 +21,7 @@ class KeyClass(object):
     PUBLIC = 1
     PRIVATE = 2
     SYMMETRIC = 3
-    
+
 class DigestAlgorithm(object):
     SHA256 = 1
     # MD2

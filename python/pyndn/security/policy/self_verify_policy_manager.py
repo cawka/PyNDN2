@@ -6,10 +6,10 @@
 #
 
 """
-This module defines the SelfVerifyPolicyManager class which implements a 
-PolicyManager to look in the IdentityStorage for the public key with the name in 
-the KeyLocator (if available) and use it to verify the data packet, without 
-searching a certificate chain. If the public key can't be found, the 
+This module defines the SelfVerifyPolicyManager class which implements a
+PolicyManager to look in the IdentityStorage for the public key with the name in
+the KeyLocator (if available) and use it to verify the data packet, without
+searching a certificate chain. If the public key can't be found, the
 verification fails.
 """
 
@@ -27,18 +27,18 @@ from pyndn.security.certificate.identity_certificate import IdentityCertificate
 
 class SelfVerifyPolicyManager(PolicyManager):
     """
-    Create a new SelfVerifyPolicyManager which will look up the public key in 
+    Create a new SelfVerifyPolicyManager which will look up the public key in
     the given identityStorage.
-    
-    :param IdentityStorage identityStorage: (optional) The IdentityStorage for 
-      looking up the public key. This object must remain valid during the life 
-      of this SelfVerifyPolicyManager. If omitted, then don't look for a public 
-      key with the name in the KeyLocator and rely on the KeyLocator having the 
+
+    :param IdentityStorage identityStorage: (optional) The IdentityStorage for
+      looking up the public key. This object must remain valid during the life
+      of this SelfVerifyPolicyManager. If omitted, then don't look for a public
+      key with the name in the KeyLocator and rely on the KeyLocator having the
       full public key DER.
     """
     def __init__(self, identityStorage = None):
         self._identityStorage = identityStorage
-        
+
     def skipVerifyAndTrust(self, data):
         """
         Never skip verification.
@@ -51,7 +51,7 @@ class SelfVerifyPolicyManager(PolicyManager):
 
     def requireVerify(self, data):
         """
-        Always return true to use the self-verification rule for the received 
+        Always return true to use the self-verification rule for the received
         data.
 
         :param Data data: The received data packet.
@@ -60,20 +60,20 @@ class SelfVerifyPolicyManager(PolicyManager):
         """
         return True
 
-    def checkVerificationPolicy(self, data, stepCount, onVerified, 
+    def checkVerificationPolicy(self, data, stepCount, onVerified,
                                 onVerifyFailed):
         """
-        Look in the IdentityStorage for the public key with the name in the 
-        KeyLocator (if available) and use it to verify the data packet. If the 
+        Look in the IdentityStorage for the public key with the name in the
+        KeyLocator (if available) and use it to verify the data packet. If the
         public key can't be found, call onVerifyFailed.
 
         :param Data data: The Data object with the signature to check.
-        :param int stepCount: The number of verification steps that have been 
+        :param int stepCount: The number of verification steps that have been
           done, used to track the verification progress. (stepCount is ignored.)
-        :param onVerified: If the signature is verified, this calls 
+        :param onVerified: If the signature is verified, this calls
           onVerified(data).
         :type onVerified: function object
-        :param onVerifyFailed: If the signature check fails or can't find the 
+        :param onVerifyFailed: If the signature check fails or can't find the
           public key, this calls onVerifyFailed(data).
         :type onVerifyFailed: function object
         :return: None for no further step for looking up a certificate chain.
@@ -84,7 +84,7 @@ class SelfVerifyPolicyManager(PolicyManager):
             raise SecurityException(
            "SelfVerifyPolicyManager: Signature is not Sha256WithRsaSignature.")
 
-        if (signature.getKeyLocator().getType() == KeyLocatorType.KEYNAME and 
+        if (signature.getKeyLocator().getType() == KeyLocatorType.KEYNAME and
             self._identityStorage != None):
             # Assume the key name is a certificate name.
             publicKeyDer = self._identityStorage.getKey(
@@ -97,33 +97,33 @@ class SelfVerifyPolicyManager(PolicyManager):
             if self._verifySha256WithRsaSignature(data, publicKeyDer):
                 onVerified(data)
             else:
-                onVerifyFailed(data) 
+                onVerifyFailed(data)
         else:
             # Can't find a key to verify.
             onVerifyFailed(data)
 
         # No more steps, so return a None.
         return None
-          
+
     def checkSigningPolicy(self, dataName, certificateName):
         """
-        Override to always indicate that the signing certificate name and data 
+        Override to always indicate that the signing certificate name and data
         name satisfy the signing policy.
 
         :param Name dataName: The name of data to be signed.
         :param Name certificateName: The name of signing certificate.
-        :return: True to indicate that the signing certificate can be used to 
+        :return: True to indicate that the signing certificate can be used to
           sign the data.
         :rtype: boolean
         """
         return True
-        
+
     def inferSigningIdentity(self, dataName):
         """
         Override to indicate that the signing identity cannot be inferred.
 
         :param Name dataName: The name of data to be signed.
-        :return: An empty name because cannot infer. 
+        :return: An empty name because cannot infer.
         :rtype: Name
         """
         return Name()
@@ -131,19 +131,19 @@ class SelfVerifyPolicyManager(PolicyManager):
     @staticmethod
     def _verifySha256WithRsaSignature(data, publicKeyDer):
         """
-        Verify the signature on the data packet using the given public key. If 
-        there is no data.getDefaultWireEncoding(), this calls data.wireEncode() 
+        Verify the signature on the data packet using the given public key. If
+        there is no data.getDefaultWireEncoding(), this calls data.wireEncode()
         to set it.
         TODO: Move this general verification code to a more central location.
- 
-        :param Data data: The data packet with the signed portion and the 
-          signature to verify. The data packet must have a 
+
+        :param Data data: The data packet with the signed portion and the
+          signature to verify. The data packet must have a
           Sha256WithRsaSignature.
-        :param Blob publicKeyDer: The DER-encoded public key used to verify the 
+        :param Blob publicKeyDer: The DER-encoded public key used to verify the
           signature.
         :return: True if the signature verifies, False if not.
         :rtype: boolean
-        :raises SecurityException: if data does not have a 
+        :raises SecurityException: if data does not have a
           Sha256WithRsaSignature.
         """
         signature = data.getSignature()
@@ -157,7 +157,7 @@ class SelfVerifyPolicyManager(PolicyManager):
         else:
             publicKeyDerBytes = publicKeyDer.toBuffer()
         publicKey = RSA.importKey(publicKeyDerBytes)
-        
+
         # Get the bytes to verify.
         # wireEncode returns the cached encoding if available.
         signedPortion = data.wireEncode().toSignedBuffer()
@@ -173,7 +173,7 @@ class SelfVerifyPolicyManager(PolicyManager):
             signatureBits = bytes(signature.getSignature().buf())
 
         # Hash and verify.
-        return PKCS1_v1_5.new(publicKey).verify(SHA256.new(signedPortion), 
+        return PKCS1_v1_5.new(publicKey).verify(SHA256.new(signedPortion),
                                                 signatureBits)
 
 # Depending on the Python version, PyCrypto uses str or bytes.

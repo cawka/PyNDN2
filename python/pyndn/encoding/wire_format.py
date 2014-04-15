@@ -6,121 +6,121 @@
 #
 
 """
-This module defines the WireFormat class which is an abstract base class for 
+This module defines the WireFormat class which is an abstract base class for
 encoding and decoding Interest, Data, etc. with a specific wire format.
 You should use a derived class such as TlvWireFormat.
 """
 
 class WireFormat(object):
     _defaultWireFormat = None
-    
+
     def encodeInterest(self, interest):
         """
-        Encode interest and return the encoding.  Your derived class should 
+        Encode interest and return the encoding.  Your derived class should
         override.
 
         :param Interest interest: The Interest object to encode.
         :return: A Blob containing the encoding.
         :rtype: Blob
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("encodeInterest is not implemented")
-    
+
     def decodeInterest(self, interest, input):
         """
-        Decode input as an interest and set the fields of the interest object.  
+        Decode input as an interest and set the fields of the interest object.
         Your derived class should override.
-        
+
         :param Interest interest: The Interest object whose fields are updated.
         :param input: The array with the bytes to decode.
         :type input: An array type with int elements
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("decodeInterest is not implemented")
 
     def encodeData(self, data):
         """
-        Encode data and return the encoding and signed offsets.  Your derived 
+        Encode data and return the encoding and signed offsets.  Your derived
         class should override.
 
         :param Data data: The Data object to encode.
         :return: A Tuple of (encoding, signedPortionBeginOffset,
           signedPortionEndOffset) where encoding is a Blob containing the
-          encoding, signedPortionBeginOffset is the offset in the encoding of 
+          encoding, signedPortionBeginOffset is the offset in the encoding of
           the beginning of the signed portion, and signedPortionEndOffset is
           the offset in the encoding of the end of the signed portion.
         :rtype: (Blob, int, int)
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("encodeData is not implemented")
-        
+
     def decodeData(self, data, input):
         """
-        Decode input as a data packet, set the fields in the data object, and 
+        Decode input as a data packet, set the fields in the data object, and
         return the signed offsets.  Your derived class should override.
 
         :param Data data: The Data object whose fields are updated.
         :param input: The array with the bytes to decode.
         :type input: An array type with int elements
-        :return: A Tuple of (signedPortionBeginOffset, signedPortionEndOffset) 
-          where signedPortionBeginOffset is the offset in the encoding of 
+        :return: A Tuple of (signedPortionBeginOffset, signedPortionEndOffset)
+          where signedPortionBeginOffset is the offset in the encoding of
           the beginning of the signed portion, and signedPortionEndOffset is
           the offset in the encoding of the end of the signed portion.
         :rtype: (int, int)
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("decodeData is not implemented")
-    
+
     def encodeForwardingEntry(self, forwardingEntry):
         """
-        Encode forwardingEntry and return the encoding.  Your derived class 
+        Encode forwardingEntry and return the encoding.  Your derived class
         should override.
 
         :param forwardingEntry: The ForwardingEntry object to encode.
         :type forwardingEntry: ForwardingEntry
         :return: A Blob containing the encoding.
         :rtype: Blob
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("encodeForwardingEntry is not implemented")
-    
+
     def decodeForwardingEntry(self, forwardingEntry, input):
         """
-        Decode input as an forwardingEntry and set the fields of the 
+        Decode input as an forwardingEntry and set the fields of the
         forwardingEntry object. Your derived class should override.
-        
-        :param forwardingEntry: The ForwardingEntry object whose fields are 
+
+        :param forwardingEntry: The ForwardingEntry object whose fields are
           updated.
         :type forwardingEntry: ForwardingEntry
         :param input: The array with the bytes to decode.
         :type input: An array type with int elements
-        :raises RuntimeError: for unimplemented if the derived class does not 
+        :raises RuntimeError: for unimplemented if the derived class does not
           override.
         """
         raise RuntimeError("decodeForwardingEntry is not implemented")
-        
+
     @classmethod
     def setDefaultWireFormat(self, wireFormat):
         """
-        Set the static default WireFormat used by default encoding and decoding 
+        Set the static default WireFormat used by default encoding and decoding
         methods.
-        
+
         :param wireFormat: An object of a subclass of WireFormat.
         :type wireFormat: A subclass of WireFormat
         """
         self._defaultWireFormat = wireFormat
-        
+
     @classmethod
     def getDefaultWireFormat(self):
         """
-        Return the default WireFormat used by default encoding and decoding 
+        Return the default WireFormat used by default encoding and decoding
         methods which was set with setDefaultWireFormat.
-        
+
         :return: The WireFormat object.
         :rtype: A subclass of WireFormat.
         """
